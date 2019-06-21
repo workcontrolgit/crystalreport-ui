@@ -28,12 +28,15 @@ export class HomeComponent implements OnInit {
       .subscribe((quote: string) => { this.quote = quote; });
   }
   onDown(type: string, fromRemote: boolean) {
+    this.isLoading = true;
     const fileName = `EmployeeProfile.${type}`;
     if (fromRemote) {
       this._httpClient.get(`http://localhost:11444/api/Details/Report/DownloadReport`, {
         observe: 'response',
         responseType: 'blob'
-      }).subscribe(res => {
+      })
+      .pipe(finalize(() => { this.isLoading = false; }))
+      .subscribe(res => {
         this._FileSaverService.save(res.body, fileName);
       });
       return;
